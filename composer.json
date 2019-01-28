@@ -1,0 +1,19 @@
+{
+    "name": "rul/easyswoole-middleware",
+    "description": "easyswoole-middleware",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "rul",
+            "email": "1011533875@qq.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "EasySwoole\\": "src/"
+        }
+    }
+}
