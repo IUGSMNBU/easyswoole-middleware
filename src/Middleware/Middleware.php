@@ -8,7 +8,7 @@
 namespace EasySwooleMiddleware\Middleware;
 use Closure;
 use ReflectionClass;
-use EasySwoole\Middleware\MiddlewareOption;
+use EasySwooleMiddleware\Middleware\MiddlewareOption;
 
 class Middleware{
 
