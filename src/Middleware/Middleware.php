@@ -5,7 +5,7 @@
  * Date: 2019/1/28
  * Time: 15:09
  */
-namespace EasySwoole\Middleware;
+namespace EasySwooleMiddleware\Middleware;
 use Closure;
 use ReflectionClass;
 use EasySwoole\Middleware\MiddlewareOption;
@@ -175,6 +175,12 @@ class Middleware{
         };
     }
 
+    /**
+     * 方法过滤
+     * @param $action
+     * @param array $options
+     * @return bool|null
+     */
     public function validation($action,array $options): ?bool
     {
         if(isset($options['except'])){

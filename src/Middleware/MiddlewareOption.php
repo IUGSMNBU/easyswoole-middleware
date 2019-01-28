@@ -5,9 +5,7 @@
  * Date: 2019/1/28
  * Time: 15:15
  */
-
-namespace EasySwoole\Middleware;
-
+namespace EasySwooleMiddleware\Middleware;
 
 class MiddlewareOption
 {
