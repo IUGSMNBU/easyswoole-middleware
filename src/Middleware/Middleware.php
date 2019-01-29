@@ -9,6 +9,7 @@ namespace EasySwooleMiddleware\Middleware;
 use Closure;
 use ReflectionClass;
 use EasySwooleMiddleware\Middleware\MiddlewareOption;
+use EasySwooleMiddleware\Middleware\Exception\MiddlewareException;
 
 class Middleware{
 
@@ -62,7 +63,7 @@ class Middleware{
     public function middleware($serviceList,array $options = []){
 
         $this->build($serviceList,$options);
-        return new MiddlewareOption($options);
+        return new MiddlewareOption($options,1);
     }
 
     /**
@@ -73,19 +74,20 @@ class Middleware{
      */
     protected function build($serviceList,array &$options){
 
-        foreach ((array) $serviceList as $item){
-            if(is_object($item)){
-                $this->bind($item,$options);
-            }elseif($item instanceof Closure){
-                $this->bind($item,$options);
-            }elseif($this->middlewareList[$item]){
-                $this->make($this->middlewareList[$item],$options);
-            }elseif(is_string($item) && class_exists($item)){
-                $this->make($item,$options);
-            }else{
-                throw new \Exception($item.'服务解析错误');
+            foreach ((array)$serviceList as $item) {
+                if (is_object($item)) {
+                    $this->bind($item, $options);
+                } elseif ($item instanceof Closure) {
+                    $this->bind($item, $options);
+                } elseif ($this->middlewareList[$item]) {
+                    $this->make($this->middlewareList[$item], $options);
+                } elseif (is_string($item) && class_exists($item)) {
+                    $this->make($item, $options);
+                } else {
+                    throw new MiddlewareException($item . '服务解析错误');
+                }
             }
-        }
+
     }
 
     /**
@@ -141,7 +143,8 @@ class Middleware{
                 return true;
             });
         }else{
-            return true;
+            $this->request->errMsg = 'middleware not empty';
+            return false;
         }
     }
 
