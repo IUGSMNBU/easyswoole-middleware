@@ -9,7 +9,7 @@ namespace EasySwooleMiddleware\Middleware;
 use Closure;
 use ReflectionClass;
 use EasySwooleMiddleware\Middleware\MiddlewareOption;
-use EasySwooleMiddleware\Middleware\Exception\MiddlewareException;
+
 
 class Middleware{
 
@@ -63,7 +63,7 @@ class Middleware{
     public function middleware($serviceList,array $options = []){
 
         $this->build($serviceList,$options);
-        return new MiddlewareOption($options,1);
+        return new MiddlewareOption($options);
     }
 
     /**
@@ -84,7 +84,7 @@ class Middleware{
                 } elseif (is_string($item) && class_exists($item)) {
                     $this->make($item, $options);
                 } else {
-                    throw new MiddlewareException($item . '服务解析错误');
+                    throw new MiddlewareException("服务无法解析：".$item);
                 }
             }
 
