@@ -24,6 +24,7 @@ class Middleware{
      * 请求实例
      */
     private $request;
+
     /**
      * @var object
      * 响应实例
@@ -37,6 +38,7 @@ class Middleware{
     private $middlewareList = [
         'web'=>\App\HttpController\Common\Web::class
     ];
+
     /**
      * @var array
      * 服务实例
@@ -55,24 +57,59 @@ class Middleware{
     }
 
     /**
-     * 中间件入口
+     * 中间件实例
      * @param $serviceList
      * @param array $options
      * @return \EasySwoole\Middleware\MiddlewareOption
      */
-    public function middleware($serviceList,array $options = []){
+    public function middleware($serviceList,array $options = []) :?object
+    {
 
         $this->build($serviceList,$options);
         return new MiddlewareOption($options);
     }
 
     /**
-     * 建立中间件
+     * 中间件执行入口
+     * @param $action
+     * @return bool|null
+     */
+    public function run($action)
+    {
+        if($this->middleware){
+            $this->request->errMsg = '';
+            $this->request->actionName = $action;
+            return $this->then(function($request){
+                if(isset($request->errMsg) && !empty($request->errMsg)){
+                    return false;
+                }
+                return true;
+            });
+        }else{
+            $this->request->errMsg = 'middleware not empty';
+            return false;
+        }
+    }
+
+    /**
+     * 中间件执行
+     * @param $passable
+     * @return mixed
+     */
+    protected function then($passable)
+    {
+        $pipes = array_reverse($this->middleware);
+        return call_user_func(array_reduce($pipes,$this->getSlice(),$passable),$this->request);
+    }
+
+    /**
+     * 绑定中间件
      * @param $serviceList
      * @param array $options
      * @throws \Exception
      */
-    protected function build($serviceList,array &$options){
+    protected function build($serviceList,array &$options)
+    {
 
             foreach ((array)$serviceList as $item) {
                 if (is_object($item)) {
@@ -91,12 +128,13 @@ class Middleware{
     }
 
     /**
-     * 保存中间件实例
+     * 中间件实例
      * @param $services
      * @param array $options
      * @return bool
      */
-    protected function make($services,array &$options){
+    protected function make($services,array &$options)
+    {
         if(is_string($services)){
             $class = new ReflectionClass($services);
             if($class->isInstantiable()){
@@ -126,43 +164,11 @@ class Middleware{
 
 
     /**
-     * 中间件执行入口
-     * @param $action
-     * @return bool|null
-     */
-
-    public function run($action): ?bool
-    {
-        if($this->middleware){
-            $this->request->errMsg = '';
-            $this->request->actionName = $action;
-            return $this->then(function($request){
-                if(isset($request->errMsg) && !empty($request->errMsg)){
-                    return false;
-                }
-                return true;
-            });
-        }else{
-            $this->request->errMsg = 'middleware not empty';
-            return false;
-        }
-    }
-
-    /**
-     * 中间件执行
-     * @param $passable
-     * @return mixed
-     */
-    protected function then($passable){
-        $pipes = array_reverse($this->middleware);
-        return call_user_func(array_reduce($pipes,$this->getSlice(),$passable),$this->request);
-    }
-
-    /**
      * 中间件包装
      * @return Closure
      */
-    protected function getSlice(){
+    protected function getSlice()
+    {
         return function ($stack, $pipe) {
             return function ($request) use ($stack, $pipe) {
                 if($this->validation($this->request->actionName,$pipe['options'])) {
@@ -184,7 +190,7 @@ class Middleware{
      * @param array $options
      * @return bool|null
      */
-    public function validation($action,array $options): ?bool
+    public function validation($action,array $options): ?void
     {
         if(isset($options['except'])){
             if(is_string($options['except'])){
