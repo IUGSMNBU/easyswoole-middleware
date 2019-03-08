@@ -190,7 +190,7 @@ class Middleware{
      * @param array $options
      * @return bool|null
      */
-    public function validation($action,array $options): ?void
+    public function validation($action,array $options):?bool
     {
         if(isset($options['except'])){
             if(is_string($options['except'])){
